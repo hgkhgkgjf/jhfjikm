@@ -2,12 +2,25 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>SkyPulse Weather</title>
+    <title>SkyPulse Pro+ · 智能天气控制台</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 可选：谷歌字体，不需要可删除 -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- 高级一点的英文字体，不需要可以删掉 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* 全局基础设置 */
+        :root {
+            --bg-deep: #050816;
+            --bg-elevated: rgba(10, 13, 40, 0.96);
+            --bg-soft: rgba(20, 26, 66, 0.92);
+            --border-subtle: rgba(163, 181, 255, 0.32);
+            --accent-primary: #7e8bff;
+            --accent-secondary: #ffb86c;
+            --accent-teal: #4fd4ff;
+            --text-main: #f5f7ff;
+            --text-soft: rgba(214, 220, 255, 0.8);
+            --danger: #ff6b81;
+            --good: #4fd18a;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -19,257 +32,396 @@
         }
 
         body {
-            font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             background:
-                radial-gradient(circle at top left, #4f7df3 0, transparent 55%),
-                radial-gradient(circle at bottom right, #e74d9c 0, transparent 55%),
-                linear-gradient(135deg, #050816 0%, #0a0f1f 40%, #050816 100%);
-            color: #f5f7ff;
+                radial-gradient(circle at 10% 0, #3b5bff 0, transparent 55%),
+                radial-gradient(circle at 90% 100%, #ff7f9a 0, transparent 55%),
+                radial-gradient(circle at 20% 100%, #42d3ff 0, transparent 55%),
+                linear-gradient(135deg, #050816 0%, #050816 30%, #020312 100%);
+            color: var(--text-main);
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 16px;
+            transition: background 0.6s ease;
         }
 
-        /* 页面外层布局 */
-        .shell-layout {
+        body.theme-night {
+            background:
+                radial-gradient(circle at 0 0, #1f2a5c 0, transparent 55%),
+                radial-gradient(circle at 100% 100%, #7e3d9a 0, transparent 55%),
+                linear-gradient(135deg, #020310 0%, #050816 60%, #020310 100%);
+        }
+
+        .app-frame {
             width: 100%;
-            max-width: 1220px;
-            min-height: 640px;
+            max-width: 1320px;
+            min-height: 680px;
             border-radius: 28px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.16), rgba(255,255,255,0.02));
-            box-shadow:
-                0 30px 80px rgba(0, 0, 0, 0.7),
-                0 0 0 1px rgba(255, 255, 255, 0.06);
+            background:
+                linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02));
             backdrop-filter: blur(22px);
             -webkit-backdrop-filter: blur(22px);
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.85),
+                0 0 0 1px rgba(255, 255, 255, 0.05);
+            padding: 18px 18px 16px;
             display: grid;
-            grid-template-columns: minmax(0, 1.8fr) minmax(0, 1.2fr);
+            grid-template-rows: auto minmax(0, 1fr);
+            gap: 12px;
+            position: relative;
             overflow: hidden;
+        }
+
+        .app-frame::before {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            background:
+                radial-gradient(circle at 10% 0, rgba(255,255,255,0.10), transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.05), transparent 60%);
+            opacity: 0.9;
+            pointer-events: none;
+        }
+
+        .app-inner {
             position: relative;
-        }
-
-        /* 左侧主区域 */
-        .primary-panel {
-            padding: 24px 32px 28px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        /* 顶部栏 */
-        .topbar-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 18px;
-        }
-
-        .brand-mark {
-            display: flex;
-            align-items: center;
+            z-index: 1;
+            display: grid;
+            grid-template-rows: auto minmax(0, 1fr);
             gap: 10px;
         }
 
-        .brand-emblem {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            background: conic-gradient(from 200deg, #ffd66b, #ff7f6b, #8b6cff, #4fd4ff, #ffd66b);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .brand-emblem::after {
-            content: "";
-            position: absolute;
-            inset: 4px;
-            border-radius: 10px;
-            background: radial-gradient(circle at 30% 0%, #ffffffaa, transparent 60%);
-            mix-blend-mode: screen;
-        }
-
-        .brand-text-main {
-            font-weight: 600;
-            font-size: 1.05rem;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-        }
-
-        .brand-text-sub {
-            font-size: 0.72rem;
-            opacity: 0.7;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-        }
-
-        .mode-toggle-group {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px;
-            border-radius: 999px;
-            background: radial-gradient(circle at top left, rgba(255,255,255,0.2), rgba(255,255,255,0.02));
-            box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
-        }
-
-        .temp-switch {
-            border: none;
-            padding: 6px 14px;
-            font-size: 0.82rem;
-            border-radius: 999px;
-            cursor: pointer;
-            background: transparent;
-            color: rgba(245,247,255,0.7);
-            transition: all 0.25s ease;
-        }
-
-        .temp-switch.active {
-            background: rgba(10,14,40,0.9);
-            color: #f5f7ff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.45);
-        }
-
-        /* 搜索与位置栏 */
-        .search-row {
-            display: grid;
-            grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.4fr);
-            gap: 14px;
-            margin-bottom: 24px;
-            margin-top: 6px;
-        }
-
-        .search-field {
-            position: relative;
-        }
-
-        .search-input-box {
-            width: 100%;
-            border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.16);
-            background: rgba(5,8,22,0.85);
-            padding: 10px 40px 10px 16px;
-            color: #f5f7ff;
-            font-size: 0.9rem;
-            outline: none;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.55);
-        }
-
-        .search-input-box::placeholder {
-            color: rgba(215, 218, 255, 0.45);
-        }
-
-        .search-icon-placeholder {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-
-        .geo-chip {
+        /* 顶部导航栏 */
+        .top-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-radius: 16px;
-            padding: 10px 14px;
-            background: linear-gradient(135deg, rgba(115, 179, 255, 0.22), rgba(251, 158, 255, 0.15));
-            box-shadow: 0 14px 35px rgba(2, 5, 26, 0.8);
-            border: 1px solid rgba(178, 209, 255, 0.45);
+            gap: 12px;
+        }
+
+        .brand-block {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-orb {
+            width: 40px;
+            height: 40px;
+            border-radius: 18px;
+            background:
+                conic-gradient(from 210deg, #ffed90, #ff8c6b, #7c78ff, #30d4ff, #ffed90);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 14px 35px rgba(0, 0, 0, 0.8);
+        }
+
+        .brand-orb::after {
+            content: "";
+            position: absolute;
+            inset: 4px;
+            border-radius: 14px;
+            background:
+                radial-gradient(circle at 30% 0, rgba(255,255,255,0.9), transparent 60%),
+                radial-gradient(circle at 80% 90%, rgba(0,0,0,0.7), transparent 60%);
+        }
+
+        .brand-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .brand-title {
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+        }
+
+        .brand-sub {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--text-soft);
+        }
+
+        .top-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-tabs {
+            display: inline-flex;
+            padding: 3px;
+            border-radius: 999px;
+            background: rgba(3, 5, 28, 0.92);
+            border: 1px solid rgba(149, 164, 255, 0.5);
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.9);
+        }
+
+        .nav-tab-btn {
+            border: none;
+            background: transparent;
+            color: var(--text-soft);
+            font-size: 0.78rem;
+            padding: 6px 12px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-tab-btn span.icon {
+            font-size: 0.88rem;
+        }
+
+        .nav-tab-btn.active {
+            background: linear-gradient(135deg, #7e8bff, #4fd4ff);
+            color: #050816;
+            box-shadow: 0 12px 28px rgba(50, 104, 255, 0.95);
+        }
+
+        .nav-tab-btn.active span.icon {
+            transform: translateY(-1px);
+        }
+
+        .nav-tab-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.06);
+        }
+
+        .unit-toggle {
+            display: inline-flex;
+            padding: 3px;
+            border-radius: 999px;
+            background: rgba(8, 12, 44, 0.95);
+            border: 1px solid rgba(158, 177, 255, 0.5);
+        }
+
+        .unit-chip {
+            border: none;
+            background: transparent;
+            color: var(--text-soft);
+            font-size: 0.78rem;
+            padding: 4px 10px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .unit-chip.active {
+            background: rgba(244, 248, 255, 0.96);
+            color: #050816;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.85);
+            font-weight: 500;
+        }
+
+        .top-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.38);
+            border: 1px solid rgba(172, 190, 255, 0.26);
+            font-size: 0.75rem;
+        }
+
+        .status-badge-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 999px;
+            background: var(--good);
+            box-shadow: 0 0 14px rgba(79, 209, 138, 0.9);
+        }
+
+        /* 页面主体区域布局 */
+        .content-grid {
+            margin-top: 6px;
+            display: grid;
+            grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.5fr);
+            gap: 12px;
+            min-height: 0;
+        }
+
+        .column-left {
+            display: grid;
+            grid-template-rows: auto minmax(0, 1fr);
+            gap: 10px;
+            min-height: 0;
+        }
+
+        .column-right {
+            display: grid;
+            grid-template-rows: minmax(0, 1.4fr) auto;
+            gap: 10px;
+            min-height: 0;
+        }
+
+        /* 搜索 + 概览卡片区域 */
+        .search-row {
+            display: grid;
+            grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.5fr);
+            gap: 10px;
+        }
+
+        .input-shell {
+            position: relative;
+        }
+
+        .city-input {
+            width: 100%;
+            border-radius: 999px;
+            border: 1px solid rgba(173, 189, 255, 0.5);
+            padding: 9px 40px 9px 14px;
+            background: radial-gradient(circle at 0 0, rgba(255,255,255,0.18), transparent 70%),
+                        rgba(5, 10, 36, 0.95);
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+            box-shadow: 0 14px 30px rgba(0,0,0,0.8);
+        }
+
+        .city-input::placeholder {
+            color: rgba(194, 204, 255, 0.7);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .location-card {
+            border-radius: 18px;
+            padding: 10px 12px;
+            background: radial-gradient(circle at 0 0, rgba(255,255,255,0.15), transparent 55%),
+                        radial-gradient(circle at 130% 0, rgba(80, 195, 255,0.5), transparent 55%),
+                        rgba(6, 11, 42, 0.98);
+            border: 1px solid rgba(164, 195, 255, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.9);
             cursor: pointer;
             transition: transform 0.16s ease, box-shadow 0.16s ease;
         }
 
-        .geo-chip:hover {
+        .location-card:hover {
             transform: translateY(-1px);
-            box-shadow: 0 18px 40px rgba(2, 5, 26, 0.9);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.95);
         }
 
-        .geo-main-label {
+        .loc-main {
             font-size: 0.9rem;
             font-weight: 500;
         }
 
-        .geo-secondary {
-            font-size: 0.74rem;
-            opacity: 0.75;
+        .loc-sub {
+            font-size: 0.78rem;
+            color: var(--text-soft);
         }
 
-        .geo-pin {
+        .loc-pin {
             width: 24px;
             height: 24px;
             border-radius: 999px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(circle at 30% 0%, #fff1c1, #ff7f6b);
-            box-shadow: 0 0 0 2px rgba(5,8,22,0.9);
-            font-size: 0.78rem;
+            background: radial-gradient(circle at 30% 0, #fff1c1, #ff8b6b);
+            box-shadow: 0 0 0 2px #050816;
+            font-size: 0.8rem;
         }
 
-        /* 当前天气区域 */
-        .live-weather-block {
-            flex: 1;
-            display: grid;
-            grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.1fr);
-            gap: 18px;
-            align-items: stretch;
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .current-card {
+        /* 当前天气大卡片 */
+        .hero-card {
+            margin-top: 6px;
             border-radius: 22px;
+            padding: 16px 18px 14px;
             background:
-                radial-gradient(circle at 10% 0, rgba(255,255,255,0.22), transparent 55%),
-                radial-gradient(circle at 120% 120%, rgba(118,188,255,0.5), transparent 50%),
-                rgba(7, 12, 40, 0.95);
-            padding: 18px 20px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.85);
+                radial-gradient(circle at 0 0, rgba(255,255,255,0.15), transparent 60%),
+                radial-gradient(circle at 110% 120%, rgba(132,189,255,0.5), transparent 60%),
+                var(--bg-elevated);
+            border: 1px solid rgba(173, 193, 255, 0.6);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.95);
             position: relative;
             overflow: hidden;
         }
 
-        .current-card::before {
+        .hero-card::before {
             content: "";
             position: absolute;
-            width: 320px;
-            height: 320px;
+            width: 260px;
+            height: 260px;
             border-radius: 999px;
-            background: radial-gradient(circle, rgba(255,255,255,0.09), transparent 70%);
-            right: -160px;
-            top: -120px;
-            opacity: 0.7;
+            right: -120px;
+            top: -80px;
+            background: radial-gradient(circle, rgba(255,255,255,0.14), transparent 70%);
+            opacity: 0.8;
         }
 
-        .current-top-line {
+        .hero-top {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 18px;
+            gap: 10px;
             position: relative;
             z-index: 1;
         }
 
-        .city-name {
-            font-size: 1.35rem;
+        .hero-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .hero-city {
+            font-size: 1.18rem;
             font-weight: 600;
         }
 
-        .update-time {
-            font-size: 0.76rem;
-            opacity: 0.75;
+        .hero-time-small {
+            font-size: 0.78rem;
+            color: var(--text-soft);
         }
 
-        .weather-badge {
-            padding: 4px 10px;
+        .hero-badges {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        .pill {
             border-radius: 999px;
-            font-size: 0.72rem;
-            background: rgba(23, 34, 80, 0.8);
-            border: 1px solid rgba(168, 190, 255, 0.72);
+            padding: 2px 9px;
+            border: 1px solid rgba(172, 191, 255, 0.6);
+            font-size: 0.7rem;
+            background: rgba(13, 19, 59, 0.96);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        .current-main-info {
+        .pill-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--accent-teal);
+            box-shadow: 0 0 10px rgba(79,212,255,0.9);
+        }
+
+        .hero-main {
+            margin-top: 10px;
             display: flex;
             align-items: flex-end;
             gap: 18px;
@@ -277,735 +429,1267 @@
             z-index: 1;
         }
 
-        .temp-display {
-            font-size: 3.8rem;
+        .hero-temp-block {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .hero-temp-line {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .hero-temp-value {
+            font-size: clamp(3rem, 5.2vw, 4.1rem);
             font-weight: 600;
             line-height: 1;
         }
 
-        .temp-unit-small {
-            font-size: 1.4rem;
-            opacity: 0.8;
+        .hero-unit-mark {
+            font-size: 1.1rem;
+            opacity: 0.85;
+            transform: translateY(3px);
         }
 
-        .condition-text {
-            font-size: 1rem;
-            margin-top: 4px;
-            opacity: 0.92;
+        .hero-condition {
+            font-size: 0.9rem;
+            color: var(--text-soft);
         }
 
-        .feels-text {
-            font-size: 0.82rem;
-            opacity: 0.75;
+        .hero-feels {
+            font-size: 0.8rem;
+            color: var(--text-soft);
         }
 
-        .icon-orbit {
+        .hero-visual {
             margin-left: auto;
             width: 120px;
             height: 120px;
             position: relative;
         }
 
-        .orbit-sphere {
+        .sun-orb {
             position: absolute;
             inset: 0;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 0, #fff8cd, #ffd06b, #ff9f6b);
-            box-shadow: 0 16px 45px rgba(255, 159, 107, 0.8);
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 0, #fff9d7, #ffd16b, #ff9b59);
+            box-shadow: 0 18px 45px rgba(255, 155, 89, 0.9);
+            transition: all 0.5s ease;
         }
 
-        .orbit-ring {
+        body.theme-night .sun-orb {
+            background: radial-gradient(circle at 30% 0, #fefbff, #b0a4ff, #6b63ff);
+            box-shadow: 0 18px 45px rgba(145, 132, 255, 0.9);
+        }
+
+        .sun-ring {
             position: absolute;
             inset: 16px;
-            border-radius: 50%;
-            border: 1px dashed rgba(4, 7, 30, 0.4);
+            border-radius: 999px;
+            border: 1px dashed rgba(8, 12, 44, 0.6);
             box-shadow: 0 0 25px rgba(255,255,255,0.08) inset;
         }
 
-        .orbit-cloud {
+        .sun-cloud {
             position: absolute;
-            bottom: 8px;
-            left: -8px;
-            right: -6px;
+            bottom: 4px;
+            left: -10px;
+            right: -4px;
             height: 40px;
             border-radius: 999px;
-            background: radial-gradient(circle at 20% 0, #ffffff, #d9e2ff);
-            box-shadow: 0 12px 30px rgba(2, 4, 18, 0.8);
+            background: radial-gradient(circle at 20% 0, #ffffff, #dde5ff);
+            box-shadow: 0 18px 40px rgba(2, 4, 18, 0.9);
         }
 
-        /* 当前详情小卡片 */
-        .details-grid {
-            margin-top: 18px;
+        .mini-kpi-row {
+            margin-top: 12px;
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 10px;
-            position: relative;
-            z-index: 1;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
         }
 
-        .mini-stat {
+        .kpi-card {
             border-radius: 14px;
-            padding: 10px 10px;
-            background: rgba(8, 13, 45, 0.95);
-            border: 1px solid rgba(161, 181, 255, 0.26);
-            font-size: 0.78rem;
+            padding: 8px 9px;
+            background: rgba(7, 10, 40, 0.95);
+            border: 1px solid rgba(153, 172, 255, 0.45);
+            font-size: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
-        .mini-label {
-            opacity: 0.7;
-            margin-bottom: 6px;
+        .kpi-label {
+            color: var(--text-soft);
+            font-size: 0.73rem;
         }
 
-        .mini-value {
-            font-weight: 500;
+        .kpi-value-line {
             display: flex;
             align-items: baseline;
             gap: 4px;
         }
 
-        .mini-unit {
+        .kpi-val-main {
+            font-weight: 500;
+        }
+
+        .kpi-val-sub {
             font-size: 0.7rem;
-            opacity: 0.7;
+            color: var(--text-soft);
         }
 
-        .trend-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #4fd4ff;
-            box-shadow: 0 0 12px rgba(79, 212, 255, 0.9);
+        /* 小时预报 + 指数卡片区域 */
+        .lower-left-row {
+            display: grid;
+            grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.2fr);
+            gap: 10px;
+            min-height: 0;
         }
 
-        /* 右边的今天时间线 */
-        .timeline-card {
-            border-radius: 20px;
-            padding: 16px 16px 14px;
-            background: rgba(5, 8, 26, 0.96);
-            border: 1px solid rgba(153, 173, 255, 0.36);
-            box-shadow: 0 22px 55px rgba(0,0,0,0.9);
+        .hourly-card {
+            border-radius: 18px;
+            padding: 10px 12px 8px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 18px 44px rgba(0,0,0,0.9);
             display: flex;
             flex-direction: column;
+            min-height: 0;
         }
 
-        .timeline-header {
+        .card-header-line {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
-            gap: 10px;
+            margin-bottom: 6px;
         }
 
-        .timeline-title {
+        .card-title {
             font-size: 0.9rem;
             font-weight: 500;
         }
 
-        .day-selector-row {
-            display: inline-flex;
-            gap: 6px;
-            background: rgba(255,255,255,0.04);
-            padding: 4px;
-            border-radius: 999px;
+        .card-caption {
+            font-size: 0.76rem;
+            color: var(--text-soft);
         }
 
-        .day-chip {
+        .chip-row {
+            display: inline-flex;
+            padding: 3px;
             border-radius: 999px;
+            background: rgba(14, 20, 60, 0.96);
+            border: 1px solid rgba(155, 175, 255, 0.5);
+            gap: 4px;
+        }
+
+        .chip-btn {
             border: none;
-            padding: 4px 10px;
-            font-size: 0.72rem;
-            cursor: pointer;
             background: transparent;
-            color: rgba(230,235,255,0.7);
+            color: var(--text-soft);
+            font-size: 0.75rem;
+            padding: 3px 9px;
+            border-radius: 999px;
+            cursor: pointer;
             transition: all 0.2s ease;
         }
 
-        .day-chip.active {
-            background: rgba(78, 121, 255, 0.8);
-            color: #ffffff;
-            box-shadow: 0 10px 20px rgba(26, 63, 199, 0.8);
+        .chip-btn.active {
+            background: rgba(129, 145, 255, 0.95);
+            color: #050816;
+            box-shadow: 0 10px 20px rgba(101, 122, 255, 0.9);
         }
 
-        .timeline-strip {
-            margin-top: 10px;
+        .hourly-strip {
+            margin-top: 6px;
             display: grid;
             grid-auto-flow: column;
-            grid-auto-columns: minmax(72px, 1fr);
-            overflow-x: auto;
+            grid-auto-columns: minmax(70px, 1fr);
             gap: 8px;
+            overflow-x: auto;
             padding-bottom: 4px;
         }
 
-        .timeline-strip::-webkit-scrollbar {
+        .hourly-strip::-webkit-scrollbar {
             height: 4px;
         }
 
-        .timeline-strip::-webkit-scrollbar-track {
+        .hourly-strip::-webkit-scrollbar-track {
             background: transparent;
         }
 
-        .timeline-strip::-webkit-scrollbar-thumb {
-            background: rgba(148, 167, 255, 0.7);
+        .hourly-strip::-webkit-scrollbar-thumb {
+            background: rgba(142, 160, 255, 0.8);
             border-radius: 999px;
         }
 
-        .hour-slot {
+        .hour-card {
             border-radius: 14px;
-            padding: 8px 8px 10px;
-            background: radial-gradient(circle at 0 0, rgba(255,255,255,0.11), rgba(4,8,38,1));
-            border: 1px solid rgba(171, 185, 255, 0.38);
+            padding: 7px 8px 9px;
+            background: radial-gradient(circle at 0 0, rgba(255,255,255,0.1), transparent 80%),
+                        rgba(10, 15, 50, 0.98);
+            border: 1px solid rgba(159, 178, 255, 0.65);
             font-size: 0.74rem;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
             min-height: 90px;
         }
 
         .hour-label {
-            opacity: 0.75;
+            color: var(--text-soft);
         }
 
         .hour-temp {
             font-weight: 500;
-            font-size: 0.92rem;
+            font-size: 0.9rem;
         }
 
-        .hour-icon-mini {
+        .hour-icon {
             width: 26px;
             height: 26px;
             border-radius: 999px;
-            background: radial-gradient(circle at 30% 0, #fff9d8, #ffbb6b);
-            box-shadow: 0 8px 18px rgba(255, 187, 107, 0.7);
+            background: radial-gradient(circle at 30% 0, #fff9d7, #ffbe6b);
+            box-shadow: 0 8px 18px rgba(255, 190, 107, 0.8);
         }
 
-        .hour-status {
-            opacity: 0.7;
+        .hour-text {
+            font-size: 0.72rem;
+            color: var(--text-soft);
+        }
+
+        body.theme-night .hour-icon.night {
+            background: radial-gradient(circle at 30% 0, #fefbff, #b3a7ff);
+            box-shadow: 0 8px 18px rgba(178, 165, 255, 0.85);
+        }
+
+        /* 指数卡片 */
+        .indices-card {
+            border-radius: 18px;
+            padding: 10px 12px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 16px 38px rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .index-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.1fr);
+            gap: 4px;
+            padding: 6px 0;
+            border-bottom: 1px dashed rgba(131, 148, 228, 0.4);
+            font-size: 0.78rem;
+        }
+
+        .index-row:last-child {
+            border-bottom: none;
+        }
+
+        .index-name {
+            color: var(--text-soft);
+        }
+
+        .index-bar-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .index-bar {
+            flex: 1;
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(24, 34, 84, 0.95);
+            overflow: hidden;
+        }
+
+        .index-bar-fill {
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #4fd18a, #ffd36b, #ff6b81);
+            transform-origin: left;
+            transform: scaleX(0.5);
+        }
+
+        .index-label {
             font-size: 0.7rem;
         }
 
-        /* 右侧预报面板 */
-        .secondary-panel {
-            padding: 22px 22px 22px 20px;
-            border-left: 1px solid rgba(209, 220, 255, 0.18);
-            background: radial-gradient(circle at 0 0, rgba(255,255,255,0.06), transparent 52%),
-                        radial-gradient(circle at 100% 100%, rgba(92,139,255,0.3), transparent 60%),
-                        rgba(4, 8, 30, 0.98);
+        /* 右侧：未来预报 + 洞察图表 */
+        .future-card {
+            border-radius: 20px;
+            padding: 10px 12px;
+            background: radial-gradient(circle at 0 0, rgba(255,255,255,0.12), transparent 60%),
+                        var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 20px 55px rgba(0,0,0,0.95);
             display: flex;
             flex-direction: column;
-        }
-
-        .side-heading {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .side-heading-title {
-            font-size: 0.92rem;
-            font-weight: 500;
-        }
-
-        .side-caption {
-            font-size: 0.78rem;
-            opacity: 0.7;
+            min-height: 0;
         }
 
         .future-list {
             margin-top: 6px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            flex: 1;
+            gap: 8px;
+            overflow-y: auto;
+        }
+
+        .future-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .future-list::-webkit-scrollbar-thumb {
+            background: rgba(142, 160, 255, 0.8);
+            border-radius: 999px;
         }
 
         .future-row {
-            border-radius: 16px;
-            padding: 10px 11px;
             display: grid;
-            grid-template-columns: minmax(0, 1.2fr) 0.9fr 1.2fr;
+            grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.2fr) minmax(0, 1.1fr);
             gap: 6px;
             align-items: center;
-            background: rgba(7, 12, 45, 0.96);
-            border: 1px solid rgba(159, 183, 255, 0.32);
-            box-shadow: 0 10px 26px rgba(0,0,0,0.7);
+            border-radius: 14px;
+            padding: 8px 9px;
+            background: rgba(10, 15, 48, 0.96);
+            border: 1px solid rgba(151, 170, 255, 0.4);
+            font-size: 0.78rem;
         }
 
         .future-row.active {
-            background: linear-gradient(120deg, rgba(117, 170, 255, 0.3), rgba(244, 162, 255, 0.3));
-            border-color: rgba(232, 241, 255, 0.88);
+            background: linear-gradient(120deg, rgba(137, 170, 255, 0.35), rgba(246, 180, 255, 0.2));
+            border-color: rgba(227, 238, 255, 0.95);
         }
 
-        .future-day-label {
-            font-size: 0.9rem;
+        .future-day {
             font-weight: 500;
         }
 
-        .future-date-label {
+        .future-date {
+            color: var(--text-soft);
             font-size: 0.7rem;
-            opacity: 0.7;
         }
 
-        .future-status {
-            font-size: 0.78rem;
-            opacity: 0.88;
+        .future-condition {
+            font-size: 0.76rem;
+            color: var(--text-soft);
+        }
+
+        .future-rain {
+            justify-self: center;
+            padding: 3px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(124, 190, 255, 0.72);
+            background: rgba(18, 44, 77, 0.96);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.72rem;
+        }
+
+        .rain-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--accent-teal);
+            box-shadow: 0 0 12px rgba(79, 212, 255, 0.9);
         }
 
         .future-temp-range {
             text-align: right;
-            font-size: 0.86rem;
+            font-size: 0.84rem;
         }
 
-        .future-max {
+        .temp-max {
             font-weight: 500;
         }
 
-        .future-min {
-            opacity: 0.7;
+        .temp-min {
+            color: var(--text-soft);
             margin-left: 6px;
         }
 
-        .precip-chip {
-            justify-self: center;
-            font-size: 0.74rem;
-            padding: 4px 9px;
-            border-radius: 999px;
-            border: 1px solid rgba(120, 184, 255, 0.7);
-            background: rgba(27, 51, 97, 0.95);
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+        /* 图表+空气质量区域 */
+        .insights-card {
+            border-radius: 20px;
+            padding: 10px 12px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 18px 50px rgba(0,0,0,0.95);
+            display: grid;
+            grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.2fr);
+            gap: 10px;
         }
 
-        .precip-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #4fd4ff;
-            box-shadow: 0 0 10px rgba(79, 212, 255, 0.9);
+        .chart-block {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
-        .side-footer {
-            margin-top: 16px;
-            padding-top: 10px;
-            border-top: 1px dashed rgba(181, 194, 255, 0.35);
-            font-size: 0.76rem;
+        .chart-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .chart-caption {
+            font-size: 0.75rem;
+            color: var(--text-soft);
+        }
+
+        .chart-wrapper {
+            margin-top: 4px;
+            border-radius: 14px;
+            border: 1px solid rgba(144, 163, 255, 0.5);
+            background: radial-gradient(circle at 0 0, rgba(255,255,255,0.06), transparent 60%),
+                        rgba(9, 14, 48, 0.96);
+            padding: 7px 10px;
+        }
+
+        .chart-svg {
+            width: 100%;
+            height: 80px;
+        }
+
+        .chart-axis {
+            stroke: rgba(153, 170, 255, 0.35);
+            stroke-width: 0.6;
+        }
+
+        .chart-line {
+            fill: none;
+            stroke: url(#tempGradient);
+            stroke-width: 2.2;
+        }
+
+        .chart-area {
+            fill: url(#tempArea);
+            opacity: 0.9;
+        }
+
+        .chart-dot {
+            fill: #ffffff;
+            stroke: #7e8bff;
+            stroke-width: 1.4;
+        }
+
+        .chart-legend {
+            margin-top: 4px;
             display: flex;
             justify-content: space-between;
-            gap: 8px;
-            align-items: center;
+            font-size: 0.72rem;
+            color: var(--text-soft);
         }
 
-        .aq-pill {
-            padding: 4px 8px;
+        .aq-block {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .aq-pill-main {
+            padding: 5px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(182, 237, 198, 0.9);
+            background: rgba(17, 76, 41, 0.96);
+            font-size: 0.78rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .aq-bubble {
+            width: 18px;
+            height: 18px;
             border-radius: 999px;
-            border: 1px solid rgba(169, 232, 183, 0.8);
-            background: rgba(18, 66, 39, 0.92);
+            background: radial-gradient(circle at 30% 0, #e6ffe6, #4fd18a);
+            box-shadow: 0 0 18px rgba(79, 209, 138, 0.9);
+        }
+
+        .aq-metrics {
+            margin-top: 2px;
+            display: grid;
+            gap: 4px;
             font-size: 0.74rem;
         }
 
-        /* 底部角标 */
-        .corner-credit {
+        .aq-row {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-soft);
+        }
+
+        .aq-value {
+            font-weight: 500;
+            color: #e3ffe9;
+        }
+
+        .footer-note {
+            margin-top: 4px;
+            font-size: 0.7rem;
+            color: var(--text-soft);
+        }
+
+        .credits-tag {
             position: absolute;
-            right: 20px;
-            bottom: 14px;
+            bottom: 10px;
+            right: 16px;
             font-size: 0.72rem;
-            opacity: 0.55;
-            letter-spacing: 0.08em;
+            color: rgba(214, 221, 255, 0.58);
             text-transform: uppercase;
+            letter-spacing: 0.12em;
         }
 
         /* 响应式 */
-        @media (max-width: 960px) {
-            .shell-layout {
-                grid-template-columns: minmax(0, 1fr);
-                min-height: auto;
-            }
-
-            .secondary-panel {
-                border-left: none;
-                border-top: 1px solid rgba(209, 220, 255, 0.18);
-                padding-top: 18px;
+        @media (max-width: 1100px) {
+            .content-grid {
+                grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.4fr);
             }
         }
 
-        @media (max-width: 720px) {
+        @media (max-width: 960px) {
             body {
                 align-items: flex-start;
             }
 
-            .shell-layout {
-                margin-top: 10px;
+            .app-frame {
+                max-width: 900px;
+                min-height: auto;
+            }
+
+            .content-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .column-right {
+                grid-template-rows: minmax(0, 1.5fr) auto;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .app-frame {
+                padding: 14px 12px 14px;
                 border-radius: 22px;
             }
 
-            .primary-panel {
-                padding: 18px 18px 20px;
+            .search-row {
+                grid-template-columns: minmax(0, 1fr);
             }
 
-            .secondary-panel {
-                padding: 18px;
+            .lower-left-row {
+                grid-template-columns: minmax(0, 1fr);
             }
 
-            .live-weather-block {
+            .insights-card {
                 grid-template-columns: minmax(0, 1fr);
             }
         }
 
         @media (max-width: 520px) {
-            .search-row {
-                grid-template-columns: minmax(0, 1fr);
-            }
-
-            .current-card {
-                padding: 16px 14px;
-            }
-
-            .details-grid {
+            .mini-kpi-row {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
-            .timeline-strip {
-                grid-auto-columns: minmax(82px, 1fr);
+            .top-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .top-controls {
+                align-self: stretch;
+                justify-content: space-between;
             }
         }
     </style>
 </head>
-<body>
-<div class="shell-layout">
-    <!-- 左侧主区域 -->
-    <section class="primary-panel">
-        <header class="topbar-row">
-            <div class="brand-mark">
-                <div class="brand-emblem"></div>
-                <div>
-                    <div class="brand-text-main">SkyPulse</div>
-                    <div class="brand-text-sub">PRECISION WEATHER SUITE</div>
+<body class="theme-day">
+<div class="app-frame">
+    <div class="app-inner">
+        <!-- 顶部导航 -->
+        <header class="top-bar">
+            <div class="brand-block">
+                <div class="brand-orb"></div>
+                <div class="brand-meta">
+                    <div class="brand-title">SKYPULSE PRO+</div>
+                    <div class="brand-sub">HYPERLOCAL WEATHER ENGINE</div>
                 </div>
             </div>
-            <div class="mode-toggle-group" id="unitToggle">
-                <button class="temp-switch active" data-unit="c">℃</button>
-                <button class="temp-switch" data-unit="f">℉</button>
+            <div class="top-controls">
+                <nav class="nav-tabs" id="viewTabs">
+                    <button class="nav-tab-btn active" data-view="overview">
+                        <span class="icon">◎</span>
+                        <span>概览</span>
+                    </button>
+                    <button class="nav-tab-btn" data-view="climate">
+                        <span class="icon">≈</span>
+                        <span>趋势</span>
+                    </button>
+                    <button class="nav-tab-btn" data-view="air">
+                        <span class="icon">◉</span>
+                        <span>空气 · 指数</span>
+                    </button>
+                </nav>
+
+                <div class="unit-toggle" id="unitToggle">
+                    <button class="unit-chip active" data-unit="c">℃</button>
+                    <button class="unit-chip" data-unit="f">℉</button>
+                </div>
+
+                <div class="top-status" id="topStatus">
+                    <span class="status-badge-dot"></span>
+                    <span id="statusText">实时数据模拟 · 延迟 &lt; 100ms</span>
+                </div>
             </div>
         </header>
 
-        <div class="search-row">
-            <div class="search-field">
-                <input
-                    type="text"
-                    class="search-input-box"
-                    id="cityInput"
-                    placeholder="搜索城市，例如：Shanghai, Tokyo, New York..."
-                >
-                <span class="search-icon-placeholder">⌕</span>
-            </div>
-            <button class="geo-chip" id="locBtn">
+        <!-- 主内容区 -->
+        <main class="content-grid">
+            <!-- 左侧：搜索 + 当前 + 小时 + 指数 -->
+            <section class="column-left">
                 <div>
-                    <div class="geo-main-label">使用当前位置</div>
-                    <div class="geo-secondary">One-tap定位并刷新预报</div>
-                </div>
-                <div class="geo-pin">◎</div>
-            </button>
-        </div>
-
-        <div class="live-weather-block">
-            <!-- 当前天气卡片 -->
-            <article class="current-card">
-                <div class="current-top-line">
-                    <div>
-                        <div class="city-name" id="cityName">Tokyo, Japan</div>
-                        <div class="update-time" id="updateTime">更新于 14:32 · 本地时间</div>
-                    </div>
-                    <div class="weather-badge" id="badgeText">稳定 · 无降水</div>
-                </div>
-
-                <div class="current-main-info">
-                    <div>
-                        <div class="temp-display">
-                            <span id="tempMain">27</span><span class="temp-unit-small">°</span>
+                    <div class="search-row">
+                        <div class="input-shell">
+                            <input
+                                id="cityInput"
+                                class="city-input"
+                                type="text"
+                                placeholder="搜索城市或地区，例如：Tokyo, Shanghai, New York..."
+                            >
+                            <span class="search-icon">⌕</span>
                         </div>
-                        <div class="condition-text" id="conditionText">部分多云 · 微风</div>
-                        <div class="feels-text" id="feelsLikeText">体感 29° · 舒适度良好</div>
+                        <button class="location-card" id="locBtn">
+                            <div>
+                                <div class="loc-main" id="locMain">使用当前位置</div>
+                                <div class="loc-sub" id="locSub">一键定位 · 自动切换时区与白天/夜晚主题</div>
+                            </div>
+                            <div class="loc-pin">◎</div>
+                        </button>
                     </div>
-                    <div class="icon-orbit">
-                        <div class="orbit-sphere"></div>
-                        <div class="orbit-ring"></div>
-                        <div class="orbit-cloud"></div>
-                    </div>
+
+                    <!-- 当前天气卡片 -->
+                    <article class="hero-card">
+                        <div class="hero-top">
+                            <div class="hero-meta">
+                                <div class="hero-city" id="cityName">Tokyo, Japan</div>
+                                <div class="hero-time-small" id="localTimeText">本地时间 14:32 · 周五</div>
+                                <div class="hero-badges">
+                                    <div class="pill">
+                                        <span class="pill-dot"></span>
+                                        <span id="badgeMain">体感舒适 · 无显著风险</span>
+                                    </div>
+                                    <div class="pill">
+                                        ☂ <span id="badgeRain">未来 90 分钟无降水</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hero-meta">
+                                <div class="hero-time-small" id="updateText">更新于 14:30 · 模拟 API</div>
+                            </div>
+                        </div>
+
+                        <div class="hero-main">
+                            <div class="hero-temp-block">
+                                <div class="hero-temp-line">
+                                    <div class="hero-temp-value" id="tempMain">27</div>
+                                    <div class="hero-unit-mark" id="tempUnitMark">°C</div>
+                                </div>
+                                <div class="hero-condition" id="conditionText">部分多云 · 微风 2 级</div>
+                                <div class="hero-feels" id="feelsLikeText">体感 29°C · 紫外线指数 5（中等防护）</div>
+                            </div>
+                            <div class="hero-visual">
+                                <div class="sun-orb"></div>
+                                <div class="sun-ring"></div>
+                                <div class="sun-cloud"></div>
+                            </div>
+                        </div>
+
+                        <div class="mini-kpi-row">
+                            <div class="kpi-card">
+                                <div class="kpi-label">风速</div>
+                                <div class="kpi-value-line">
+                                    <span class="kpi-val-main" id="windVal">12</span>
+                                    <span class="kpi-val-sub" id="windUnit">km/h 东北风</span>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">湿度</div>
+                                <div class="kpi-value-line">
+                                    <span class="kpi-val-main" id="humidityVal">64</span>
+                                    <span class="kpi-val-sub">%</span>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">气压</div>
+                                <div class="kpi-value-line">
+                                    <span class="kpi-val-main" id="pressureVal">1013</span>
+                                    <span class="kpi-val-sub">hPa</span>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">能见度</div>
+                                <div class="kpi-value-line">
+                                    <span class="kpi-val-main" id="visibilityVal">10</span>
+                                    <span class="kpi-val-sub" id="visibilityUnit">km · 极佳</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
                 </div>
 
-                <div class="details-grid">
-                    <div class="mini-stat">
-                        <div class="mini-label">风速</div>
-                        <div class="mini-value"><span id="windVal">12</span><span class="mini-unit">km/h 东北风</span></div>
-                    </div>
-                    <div class="mini-stat">
-                        <div class="mini-label">湿度</div>
-                        <div class="mini-value">
-                            <span id="humidityVal">64</span><span class="mini-unit">%</span>
-                            <span class="trend-dot"></span>
+                <!-- 下半部分：小时预报 + 指数 -->
+                <div class="lower-left-row">
+                    <section class="hourly-card">
+                        <div class="card-header-line">
+                            <div>
+                                <div class="card-title">小时级趋势</div>
+                                <div class="card-caption">温度、云量和体感变化一屏掌握</div>
+                            </div>
+                            <div class="chip-row" id="daySelector">
+                                <button class="chip-btn active" data-day="0">今天</button>
+                                <button class="chip-btn" data-day="1">明天</button>
+                                <button class="chip-btn" data-day="2">后天</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="mini-stat">
-                        <div class="mini-label">气压</div>
-                        <div class="mini-value">
-                            <span id="pressureVal">1013</span><span class="mini-unit">hPa</span>
-                        </div>
-                    </div>
-                </div>
-            </article>
 
-            <!-- 今天小时预报时间线 -->
-            <aside class="timeline-card">
-                <div class="timeline-header">
-                    <div class="timeline-title">今日逐小时趋势</div>
-                    <div class="day-selector-row" id="daySelector">
-                        <button class="day-chip active" data-day="0">今天</button>
-                        <button class="day-chip" data-day="1">明天</button>
-                        <button class="day-chip" data-day="2">后天</button>
+                        <div class="hourly-strip" id="hourlyStrip"></div>
+                    </section>
+
+                    <aside class="indices-card">
+                        <div class="card-header-line">
+                            <div>
+                                <div class="card-title">出行 · 健康指数</div>
+                                <div class="card-caption" id="indicesSummary">适合步行与户外活动 · 轻薄外套即可</div>
+                            </div>
+                        </div>
+                        <div class="index-row">
+                            <div class="index-name">舒适度指数</div>
+                            <div class="index-bar-wrapper">
+                                <div class="index-bar">
+                                    <div class="index-bar-fill" id="comfortBar" style="transform:scaleX(0.78)"></div>
+                                </div>
+                                <div class="index-label">良好</div>
+                            </div>
+                        </div>
+                        <div class="index-row">
+                            <div class="index-name">紫外线 · 防晒</div>
+                            <div class="index-bar-wrapper">
+                                <div class="index-bar">
+                                    <div class="index-bar-fill" id="uvBar" style="transform:scaleX(0.52)"></div>
+                                </div>
+                                <div class="index-label" id="uvText">中等</div>
+                            </div>
+                        </div>
+                        <div class="index-row">
+                            <div class="index-name">通勤 · 出行</div>
+                            <div class="index-bar-wrapper">
+                                <div class="index-bar">
+                                    <div class="index-bar-fill" id="commuteBar" style="transform:scaleX(0.9)"></div>
+                                </div>
+                                <div class="index-label">顺畅</div>
+                            </div>
+                        </div>
+                        <div class="index-row">
+                            <div class="index-name">过敏风险</div>
+                            <div class="index-bar-wrapper">
+                                <div class="index-bar">
+                                    <div class="index-bar-fill" id="allergyBar" style="transform:scaleX(0.35)"></div>
+                                </div>
+                                <div class="index-label" id="allergyText">较低</div>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </section>
+
+            <!-- 右侧：未来预报 + 图表 + 空气质量 -->
+            <aside class="column-right">
+                <section class="future-card">
+                    <div class="card-header-line">
+                        <div>
+                            <div class="card-title">未来 7 日预报</div>
+                            <div class="card-caption">最高 / 最低温、降水概率与天气转折点</div>
+                        </div>
                     </div>
-                </div>
-                <div class="timeline-strip" id="hourlyStrip">
-                    <!-- JS填充 -->
-                </div>
+                    <div class="future-list" id="futureList"></div>
+                </section>
+
+                <section class="insights-card">
+                    <div class="chart-block">
+                        <div class="chart-title">温度走势 · 未来一周</div>
+                        <div class="chart-caption">可视化高低温区间，便于排期户外活动或营销运营</div>
+                        <div class="chart-wrapper">
+                            <svg class="chart-svg" viewBox="0 0 260 80" preserveAspectRatio="none" id="tempChart">
+                                <defs>
+                                    <linearGradient id="tempGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#4fd4ff"/>
+                                        <stop offset="50%" stop-color="#7e8bff"/>
+                                        <stop offset="100%" stop-color="#ffb86c"/>
+                                    </linearGradient>
+                                    <linearGradient id="tempArea" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="rgba(126,139,255,0.8)"/>
+                                        <stop offset="100%" stop-color="rgba(5,8,22,0.1)"/>
+                                    </linearGradient>
+                                </defs>
+                                <line class="chart-axis" x1="0" y1="76" x2="260" y2="76"></line>
+                                <line class="chart-axis" x1="0" y1="12" x2="0" y2="76"></line>
+                                <!-- 曲线和点由 JS 注入 -->
+                            </svg>
+                            <div class="chart-legend" id="chartLegend">
+                                <span id="legendRange">高温区间：24°C - 29°C</span>
+                                <span id="legendHint">提示：周一略降温，适合室外跑步</span>
+                            </div>
+                        </div>
+                    </div>
+                    <aside class="aq-block">
+                        <div class="chart-title">空气质量概览</div>
+                        <div class="aq-pill-main" id="aqPill">
+                            <div class="aq-bubble"></div>
+                            <span>空气质量 良 · AQI 42</span>
+                        </div>
+                        <div class="aq-metrics">
+                            <div class="aq-row">
+                                <span>PM₂₅</span>
+                                <span class="aq-value" id="pm25Val">18 μg/m³</span>
+                            </div>
+                            <div class="aq-row">
+                                <span>PM₁₀</span>
+                                <span class="aq-value" id="pm10Val">26 μg/m³</span>
+                            </div>
+                            <div class="aq-row">
+                                <span>臭氧 O₃</span>
+                                <span class="aq-value" id="o3Val">63 μg/m³</span>
+                            </div>
+                            <div class="aq-row">
+                                <span>NO₂</span>
+                                <span class="aq-value" id="no2Val">21 μg/m³</span>
+                            </div>
+                        </div>
+                        <div class="footer-note">
+                            当前为演示数据。接入真实天气 / 空气 API 后，可支撑企业级监控与告警策略。
+                        </div>
+                    </aside>
+                </section>
             </aside>
-        </div>
+        </main>
+    </div>
 
-        <div class="corner-credit">
-            Designed for precision-focused clients · SkyPulse Studio
-        </div>
-    </section>
-
-    <!-- 右侧未来预报 -->
-    <aside class="secondary-panel">
-        <div class="side-heading">
-            <div>
-                <div class="side-heading-title">未来 7 日预报</div>
-                <div class="side-caption">温度波动与降水概率一目了然</div>
-            </div>
-        </div>
-
-        <div class="future-list" id="futureList">
-            <!-- JS填充 -->
-        </div>
-
-        <div class="side-footer">
-            <div class="aq-pill" id="aqPill">空气质量 · 良 (AQI 42)</div>
-            <div>数据为演示示例，可接入任意天气 API</div>
-        </div>
-    </aside>
+    <div class="credits-tag">Designed · SkyPulse Studio</div>
 </div>
 
 <script>
-    // 简单演示数据（可替换为真实 API 返回值）
-    const demoWeather = {
+    // ======== 模拟天气数据（可接真实 API 替换） ========
+    const state = {
         unit: 'c',
-        current: {
-            city: 'Tokyo, Japan',
-            tempC: 27,
-            condition: '部分多云 · 微风',
-            feelsC: 29,
-            wind: '12 km/h 东北风',
-            humidity: 64,
-            pressure: 1013,
-            badge: '稳定 · 无降水',
-            updated: '更新于 14:32 · 本地时间'
-        },
-        hourly: [
-            // dayIndex 0 = 今天
-            [
-                { time: '现在', tempC: 27, status: '多云', type: 'day' },
-                { time: '15:00', tempC: 28, status: '晴间多云', type: 'day' },
-                { time: '16:00', tempC: 27, status: '晴朗', type: 'day' },
-                { time: '17:00', tempC: 25, status: '微风', type: 'day' },
-                { time: '18:00', tempC: 23, status: '傍晚清凉', type: 'night' },
-                { time: '19:00', tempC: 22, status: '少云', type: 'night' },
-                { time: '20:00', tempC: 21, status: '能见度佳', type: 'night' }
+        theme: 'day',
+        data: {
+            current: {
+                city: 'Tokyo, Japan',
+                tempC: 27,
+                feelsC: 29,
+                condition: '部分多云 · 微风 2 级',
+                humidity: 64,
+                pressure: 1013,
+                windKmh: 12,
+                visibilityKm: 10,
+                uvIndex: 5,
+                updated: '更新于 14:30 · 模拟 API',
+                localTimeLabel: '本地时间 14:32 · 周五',
+                badgeMain: '体感舒适 · 无显著风险',
+                badgeRain: '未来 90 分钟无降水'
+            },
+            hourly: [
+                // 今天
+                [
+                    { time: '现在', tempC: 27, status: '多云', type: 'day' },
+                    { time: '15:00', tempC: 28, status: '晴间多云', type: 'day' },
+                    { time: '16:00', tempC: 27, status: '阳光稳定', type: 'day' },
+                    { time: '17:00', tempC: 25, status: '傍晚微风', type: 'day' },
+                    { time: '18:00', tempC: 23, status: '日落时分', type: 'night' },
+                    { time: '19:00', tempC: 22, status: '少云 · 通透', type: 'night' },
+                    { time: '20:00', tempC: 21, status: '晚间凉爽', type: 'night' }
+                ],
+                // 明天
+                [
+                    { time: '08:00', tempC: 23, status: '清晨晴朗', type: 'day' },
+                    { time: '11:00', tempC: 27, status: '紫外线偏高', type: 'day' },
+                    { time: '14:00', tempC: 29, status: '略感闷热', type: 'day' },
+                    { time: '17:00', tempC: 26, status: '转多云', type: 'day' },
+                    { time: '20:00', tempC: 22, status: '晚间舒适', type: 'night' }
+                ],
+                // 后天
+                [
+                    { time: '08:00', tempC: 21, status: '清晨微凉', type: 'day' },
+                    { time: '11:00', tempC: 25, status: '薄云', type: 'day' },
+                    { time: '14:00', tempC: 26, status: '体感舒适', type: 'day' },
+                    { time: '17:00', tempC: 24, status: '微风', type: 'day' },
+                    { time: '20:00', tempC: 21, status: '云层稍多', type: 'night' }
+                ]
             ],
-            // dayIndex 1 = 明天
-            [
-                { time: '08:00', tempC: 23, status: '早晨晴朗', type: 'day' },
-                { time: '11:00', tempC: 27, status: '阳光充足', type: 'day' },
-                { time: '14:00', tempC: 29, status: '略感闷热', type: 'day' },
-                { time: '17:00', tempC: 26, status: '转多云', type: 'day' },
-                { time: '20:00', tempC: 22, status: '晚间清爽', type: 'night' }
+            future: [
+                { dayLabel: '今天', date: '周五 · 11/14', maxC: 28, minC: 21, status: '多云转晴', rain: 10 },
+                { dayLabel: '明天', date: '周六 · 11/15', maxC: 29, minC: 22, status: '晴朗偏热', rain: 5 },
+                { dayLabel: '周日', date: '周日 · 11/16', maxC: 27, minC: 20, status: '温度舒适', rain: 12 },
+                { dayLabel: '周一', date: '周一 · 11/17', maxC: 24, minC: 18, status: '短时小雨', rain: 40 },
+                { dayLabel: '周二', date: '周二 · 11/18', maxC: 23, minC: 17, status: '阵雨转阴', rain: 55 },
+                { dayLabel: '周三', date: '周三 · 11/19', maxC: 25, minC: 18, status: '多云', rain: 20 },
+                { dayLabel: '周四', date: '周四 · 11/20', maxC: 26, minC: 19, status: '少云', rain: 8 }
             ],
-            // dayIndex 2 = 后天
-            [
-                { time: '08:00', tempC: 21, status: '清晨凉爽', type: 'day' },
-                { time: '11:00', tempC: 25, status: '薄云', type: 'day' },
-                { time: '14:00', tempC: 26, status: '舒适', type: 'day' },
-                { time: '17:00', tempC: 24, status: '微风', type: 'day' },
-                { time: '20:00', tempC: 21, status: '云层增多', type: 'night' }
-            ]
-        ],
-        future: [
-            { label: '今天', date: '周五 · 11/14', maxC: 28, minC: 21, status: '多云转晴', rain: 10 },
-            { label: '明天', date: '周六 · 11/15', maxC: 29, minC: 22, status: '晴朗偏热', rain: 5 },
-            { label: '周日', date: '周日 · 11/16', maxC: 27, minC: 20, status: '温度舒适', rain: 12 },
-            { label: '周一', date: '周一 · 11/17', maxC: 24, minC: 18, status: '短时小雨', rain: 40 },
-            { label: '周二', date: '周二 · 11/18', maxC: 23, minC: 17, status: '阵雨转阴', rain: 55 },
-            { label: '周三', date: '周三 · 11/19', maxC: 25, minC: 18, status: '多云', rain: 20 },
-            { label: '周四', date: '周四 · 11/20', maxC: 26, minC: 19, status: '少云', rain: 8 }
-        ]
+            air: {
+                aqi: 42,
+                pm25: 18,
+                pm10: 26,
+                o3: 63,
+                no2: 21,
+                levelText: '良',
+                suggestion: '适合开窗通风，户外运动无明显限制。'
+            }
+        }
     };
 
-    const tempMainEl = document.getElementById('tempMain');
-    const conditionTextEl = document.getElementById('conditionText');
-    const feelsLikeTextEl = document.getElementById('feelsLikeText');
-    const cityNameEl = document.getElementById('cityName');
-    const updateTimeEl = document.getElementById('updateTime');
-    const badgeTextEl = document.getElementById('badgeText');
-    const windValEl = document.getElementById('windVal');
-    const humidityValEl = document.getElementById('humidityVal');
-    const pressureValEl = document.getElementById('pressureVal');
-    const hourlyStripEl = document.getElementById('hourlyStrip');
-    const futureListEl = document.getElementById('futureList');
-    const unitToggleEl = document.getElementById('unitToggle');
-
-    // 将摄氏转换为华氏
+    // ======== 工具函数 ========
     function cToF(c) {
         return Math.round(c * 9 / 5 + 32);
     }
 
-    function getTempWithUnit(c) {
-        return demoWeather.unit === 'c' ? c : cToF(c);
+    function withUnit(c) {
+        return state.unit === 'c' ? c : cToF(c);
     }
 
+    function formatUnitLabel() {
+        return state.unit === 'c' ? '°C' : '°F';
+    }
+
+    function updateThemeByTime() {
+        const now = new Date();
+        const hour = now.getHours();
+        const isNight = hour >= 19 || hour < 6;
+        state.theme = isNight ? 'night' : 'day';
+        document.body.classList.toggle('theme-night', isNight);
+    }
+
+    // ======== DOM 引用 ========
+    const cityNameEl = document.getElementById('cityName');
+    const localTimeTextEl = document.getElementById('localTimeText');
+    const updateTextEl = document.getElementById('updateText');
+    const badgeMainEl = document.getElementById('badgeMain');
+    const badgeRainEl = document.getElementById('badgeRain');
+    const tempMainEl = document.getElementById('tempMain');
+    const tempUnitMarkEl = document.getElementById('tempUnitMark');
+    const conditionTextEl = document.getElementById('conditionText');
+    const feelsLikeTextEl = document.getElementById('feelsLikeText');
+    const windValEl = document.getElementById('windVal');
+    const windUnitEl = document.getElementById('windUnit');
+    const humidityValEl = document.getElementById('humidityVal');
+    const pressureValEl = document.getElementById('pressureVal');
+    const visibilityValEl = document.getElementById('visibilityVal');
+    const visibilityUnitEl = document.getElementById('visibilityUnit');
+    const hourlyStripEl = document.getElementById('hourlyStrip');
+    const daySelectorEl = document.getElementById('daySelector');
+    const futureListEl = document.getElementById('futureList');
+    const unitToggleEl = document.getElementById('unitToggle');
+    const statusTextEl = document.getElementById('statusText');
+    const indicesSummaryEl = document.getElementById('indicesSummary');
+    const uvBarEl = document.getElementById('uvBar');
+    const uvTextEl = document.getElementById('uvText');
+    const comfortBarEl = document.getElementById('comfortBar');
+    const commuteBarEl = document.getElementById('commuteBar');
+    const allergyBarEl = document.getElementById('allergyBar');
+    const chartSvgEl = document.getElementById('tempChart');
+    const legendRangeEl = document.getElementById('legendRange');
+    const legendHintEl = document.getElementById('legendHint');
+    const aqPillEl = document.getElementById('aqPill');
+    const pm25ValEl = document.getElementById('pm25Val');
+    const pm10ValEl = document.getElementById('pm10Val');
+    const o3ValEl = document.getElementById('o3Val');
+    const no2ValEl = document.getElementById('no2Val');
+    const cityInputEl = document.getElementById('cityInput');
+    const locMainEl = document.getElementById('locMain');
+    const locSubEl = document.getElementById('locSub');
+
+    // ======== 渲染函数 ========
     function renderCurrent() {
-        const c = demoWeather.current;
+        const c = state.data.current;
         cityNameEl.textContent = c.city;
-        updateTimeEl.textContent = c.updated;
+        localTimeTextEl.textContent = c.localTimeLabel;
+        updateTextEl.textContent = c.updated;
+        badgeMainEl.textContent = c.badgeMain;
+        badgeRainEl.textContent = c.badgeRain;
+
+        tempMainEl.textContent = withUnit(c.tempC);
+        tempUnitMarkEl.textContent = formatUnitLabel();
+
         conditionTextEl.textContent = c.condition;
-        badgeTextEl.textContent = c.badge;
-        windValEl.textContent = c.wind.replace('km/h 东北风', demoWeather.unit === 'c' ? 'km/h 东北风' : 'mph NE wind');
+
+        const feels = withUnit(c.feelsC);
+        feelsLikeTextEl.textContent =
+            `体感 ${feels}${formatUnitLabel()} · 紫外线指数 ${c.uvIndex}（中等防护）`;
+
+        windValEl.textContent = state.unit === 'c' ? c.windKmh : Math.round(c.windKmh * 0.621);
+        windUnitEl.textContent = state.unit === 'c'
+            ? 'km/h 东北风'
+            : 'mph NE wind';
+
         humidityValEl.textContent = c.humidity;
         pressureValEl.textContent = c.pressure;
-
-        const tempVal = getTempWithUnit(c.tempC);
-        const feelsVal = getTempWithUnit(c.feelsC);
-        tempMainEl.textContent = tempVal;
-        const unitSymbol = demoWeather.unit === 'c' ? '°C' : '°F';
-        feelsLikeTextEl.textContent = `体感 ${feelsVal}° · ${unitSymbol} 模式`;
+        visibilityValEl.textContent = state.unit === 'c' ? c.visibilityKm : Math.round(c.visibilityKm * 0.621);
+        visibilityUnitEl.textContent = state.unit === 'c'
+            ? 'km · 极佳'
+            : 'mi · excellent';
     }
 
     function renderHourly(dayIndex) {
+        const list = state.data.hourly[dayIndex] || [];
         hourlyStripEl.innerHTML = '';
-        const list = demoWeather.hourly[dayIndex] || [];
 
         list.forEach(item => {
-            const slot = document.createElement('div');
-            slot.className = 'hour-slot';
+            const card = document.createElement('div');
+            card.className = 'hour-card';
 
-            const iconMini = document.createElement('div');
-            iconMini.className = 'hour-icon-mini';
-            if (item.type === 'night') {
-                iconMini.style.background = 'radial-gradient(circle at 30% 0, #f9f7ff, #9b8cff)';
-                iconMini.style.boxShadow = '0 8px 18px rgba(155, 140, 255, 0.7)';
-            }
+            const labelEl = document.createElement('div');
+            labelEl.className = 'hour-label';
+            labelEl.textContent = item.time;
 
-            slot.innerHTML = `
-                <div class="hour-label">${item.time}</div>
-            `;
-            slot.appendChild(iconMini);
+            const icon = document.createElement('div');
+            icon.className = 'hour-icon';
+            if (item.type === 'night') icon.classList.add('night');
 
-            const tempSpan = document.createElement('div');
-            tempSpan.className = 'hour-temp';
-            tempSpan.textContent = `${getTempWithUnit(item.tempC)}°`;
-            slot.appendChild(tempSpan);
+            const temp = document.createElement('div');
+            temp.className = 'hour-temp';
+            temp.textContent = `${withUnit(item.tempC)}°`;
 
-            const status = document.createElement('div');
-            status.className = 'hour-status';
-            status.textContent = item.status;
-            slot.appendChild(status);
+            const text = document.createElement('div');
+            text.className = 'hour-text';
+            text.textContent = item.status;
 
-            hourlyStripEl.appendChild(slot);
+            card.appendChild(labelEl);
+            card.appendChild(icon);
+            card.appendChild(temp);
+            card.appendChild(text);
+            hourlyStripEl.appendChild(card);
         });
     }
 
     function renderFuture() {
         futureListEl.innerHTML = '';
-        demoWeather.future.forEach((d, index) => {
+        const temps = [];
+
+        state.data.future.forEach((d, index) => {
+            temps.push(d.maxC, d.minC);
+
             const row = document.createElement('div');
             row.className = 'future-row' + (index === 0 ? ' active' : '');
 
-            const maxVal = getTempWithUnit(d.maxC);
-            const minVal = getTempWithUnit(d.minC);
+            const left = document.createElement('div');
+            const day = document.createElement('div');
+            day.className = 'future-day';
+            day.textContent = d.dayLabel;
+            const date = document.createElement('div');
+            date.className = 'future-date';
+            date.textContent = d.date;
+            left.appendChild(day);
+            left.appendChild(date);
 
-            row.innerHTML = `
-                <div>
-                    <div class="future-day-label">${d.label}</div>
-                    <div class="future-date-label">${d.date}</div>
-                </div>
-                <div class="precip-chip">
-                    <span class="precip-dot"></span>
-                    <span>${d.rain}% 降水</span>
-                </div>
-                <div class="future-temp-range">
-                    <span class="future-max">${maxVal}°</span>
-                    <span class="future-min">${minVal}°</span>
-                    <div class="future-status">${d.status}</div>
-                </div>
+            const mid = document.createElement('div');
+            mid.className = 'future-rain';
+            const dot = document.createElement('span');
+            dot.className = 'rain-dot';
+            const txt = document.createElement('span');
+            txt.textContent = `${d.rain}% 降水`;
+            mid.appendChild(dot);
+            mid.appendChild(txt);
+
+            const right = document.createElement('div');
+            right.className = 'future-temp-range';
+            right.innerHTML = `
+                <span class="temp-max">${withUnit(d.maxC)}°</span>
+                <span class="temp-min">${withUnit(d.minC)}°</span>
+                <div class="future-condition">${d.status}</div>
             `;
+
+            row.appendChild(left);
+            row.appendChild(mid);
+            row.appendChild(right);
             futureListEl.appendChild(row);
         });
+
+        // 更新图表
+        renderTempChart();
     }
 
-    // 单位切换
-    unitToggleEl.addEventListener('click', (e) => {
-        const btn = e.target.closest('.temp-switch');
-        if (!btn) return;
-        const value = btn.getAttribute('data-unit');
-        if (value && value !== demoWeather.unit) {
-            demoWeather.unit = value;
+    function renderTempChart() {
+        // 先移除已有路径
+        const oldPaths = chartSvgEl.querySelectorAll('.chart-line, .chart-area, .chart-dot');
+        oldPaths.forEach(el => el.remove());
 
-            unitToggleEl.querySelectorAll('.temp-switch').forEach(b => {
-                b.classList.toggle('active', b === btn);
-            });
+        const future = state.data.future;
+        if (!future.length) return;
 
-            renderCurrent();
-            // 根据当前激活的日标签重绘
-            const activeDayBtn = document.querySelector('.day-chip.active');
-            const idx = Number(activeDayBtn?.getAttribute('data-day') || 0);
-            renderHourly(idx);
-            renderFuture();
+        const maxTemps = future.map(f => f.maxC);
+        const minTemps = future.map(f => f.minC);
+        const all = [...maxTemps, ...minTemps];
+        const minVal = Math.min(...all);
+        const maxVal = Math.max(...all);
+
+        const width = 260;
+        const height = 80;
+        const paddingLeft = 4;
+        const paddingRight = 4;
+        const paddingTop = 10;
+        const paddingBottom = 8;
+        const usableWidth = width - paddingLeft - paddingRight;
+        const usableHeight = height - paddingTop - paddingBottom;
+
+        function scaleY(val) {
+            const ratio = (val - minVal) / (maxVal - minVal || 1);
+            return paddingTop + usableHeight - ratio * usableHeight;
         }
+
+        const step = usableWidth / (future.length - 1 || 1);
+        const points = maxTemps.map((t, i) => ({
+            x: paddingLeft + step * i,
+            y: scaleY(t)
+        }));
+
+        // 生成折线路径
+        let d = '';
+        points.forEach((p, i) => {
+            d += (i === 0 ? 'M' : 'L') + p.x + ' ' + p.y + ' ';
+        });
+
+        // 面积
+        let areaPath = d;
+        const last = points[points.length - 1];
+        const first = points[0];
+        areaPath += `L ${last.x} ${height - paddingBottom} L ${first.x} ${height - paddingBottom} Z`;
+
+        const areaEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        areaEl.setAttribute('d', areaPath);
+        areaEl.setAttribute('class', 'chart-area');
+        chartSvgEl.appendChild(areaEl);
+
+        const lineEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        lineEl.setAttribute('d', d);
+        lineEl.setAttribute('class', 'chart-line');
+        chartSvgEl.appendChild(lineEl);
+
+        points.forEach(p => {
+            const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            dot.setAttribute('cx', p.x);
+            dot.setAttribute('cy', p.y);
+            dot.setAttribute('r', 2.3);
+            dot.setAttribute('class', 'chart-dot');
+            chartSvgEl.appendChild(dot);
+        });
+
+        const globalMax = Math.max(...maxTemps);
+        const globalMin = Math.min(...minTemps);
+        legendRangeEl.textContent =
+            `高温区间：${withUnit(globalMin)}${formatUnitLabel()} - ${withUnit(globalMax)}${formatUnitLabel()}`;
+        legendHintEl.textContent = '提示：周一略降温，早晚活动更舒适。';
+    }
+
+    function renderIndicesAndAir() {
+        const c = state.data.current;
+        const air = state.data.air;
+        uvBarEl.style.transform = `scaleX(${Math.min(c.uvIndex / 10, 1)})`;
+        uvTextEl.textContent = c.uvIndex <= 2 ? '较弱' : c.uvIndex <= 5 ? '中等' : '偏强';
+
+        comfortBarEl.style.transform = 'scaleX(0.78)';
+        commuteBarEl.style.transform = 'scaleX(0.9)';
+        allergyBarEl.style.transform = 'scaleX(0.35)';
+        indicesSummaryEl.textContent = '适合步行与户外活动 · 轻薄外套即可。';
+
+        aqPillEl.innerHTML = `<div class="aq-bubble"></div><span>空气质量 ${air.levelText} · AQI ${air.aqi}</span>`;
+        pm25ValEl.textContent = `${air.pm25} μg/m³`;
+        pm10ValEl.textContent = `${air.pm10} μg/m³`;
+        o3ValEl.textContent = `${air.o3} μg/m³`;
+        no2ValEl.textContent = `${air.no2} μg/m³`;
+    }
+
+    // ======== 交互绑定 ========
+    unitToggleEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('.unit-chip');
+        if (!btn) return;
+        const newUnit = btn.getAttribute('data-unit');
+        if (!newUnit || newUnit === state.unit) return;
+        state.unit = newUnit;
+
+        unitToggleEl.querySelectorAll('.unit-chip').forEach(b => {
+            b.classList.toggle('active', b === btn);
+        });
+
+        renderCurrent();
+        const activeDayBtn = daySelectorEl.querySelector('.chip-btn.active');
+        const idx = Number(activeDayBtn?.getAttribute('data-day') || 0);
+        renderHourly(idx);
+        renderFuture();
     });
 
-    // 日选择
-    document.getElementById('daySelector').addEventListener('click', (e) => {
-        const btn = e.target.closest('.day-chip');
+    daySelectorEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('.chip-btn');
         if (!btn) return;
-        document.querySelectorAll('.day-chip').forEach(b => b.classList.remove('active'));
+        daySelectorEl.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const idx = Number(btn.getAttribute('data-day') || 0);
         renderHourly(idx);
     });
 
-    // 输入框模拟搜索（这里只做视觉反馈）
-    document.getElementById('cityInput').addEventListener('keydown', (e) => {
+    cityInputEl.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             const value = e.target.value.trim();
             if (!value) return;
-            // 真正接 API 时在这里发请求即可
+            state.data.current.city = value;
             cityNameEl.textContent = value;
-            badgeTextEl.textContent = '示例模式 · 等待真实数据';
-            updateTimeEl.textContent = '已模拟切换城市';
+            statusTextEl.textContent = '已切换为演示城市 · 等待接入真实 API';
+            badgeMainEl.textContent = '示例城市 · 数据为预设模板';
         }
     });
 
-    // 位置按钮点击示例
     document.getElementById('locBtn').addEventListener('click', () => {
-        badgeTextEl.textContent = '正在模拟定位...';
+        locMainEl.textContent = '定位中...';
+        locSubEl.textContent = '正在模拟获取经纬度与时区';
+        statusTextEl.textContent = '正在模拟定位...';
+
         setTimeout(() => {
-            badgeTextEl.textContent = '定位成功 · 示例位置';
-            cityNameEl.textContent = 'Current Location';
-        }, 800);
+            locMainEl.textContent = '当前位置 · Tokyo Area';
+            locSubEl.textContent = '已根据浏览器时区模拟定位';
+            statusTextEl.textContent = '定位成功 · 模拟经纬度注入成功';
+            // 真实场景可在这里用 geolocation + API 拉取数据
+        }, 900);
     });
 
-    // 初始化渲染
-    renderCurrent();
-    renderHourly(0);
-    renderFuture();
+    document.getElementById('viewTabs').addEventListener('click', (e) => {
+        const btn = e.target.closest('.nav-tab-btn');
+        if (!btn) return;
+        document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const view = btn.getAttribute('data-view');
+        if (view === 'climate') {
+            statusTextEl.textContent = '气候趋势视图已激活 · 适合运营 / 产品分析';
+        } else if (view === 'air') {
+            statusTextEl.textContent = '空气与健康指数视图已激活 · 适合安全与健康模块';
+        } else {
+            statusTextEl.textContent = '实时数据模拟 · 延迟 < 100ms';
+        }
+    });
+
+    // ======== 初始化 ========
+    function init() {
+        updateThemeByTime();
+        renderCurrent();
+        renderHourly(0);
+        renderFuture();
+        renderIndicesAndAir();
+    }
+
+    init();
 </script>
 </body>
 </html>
